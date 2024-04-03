@@ -204,21 +204,21 @@ int main(int argc, char **argv) {
 	InitGLFW(argc, argv);
 
 	// TODO: Make these directories relative to root directory of project
-	Shader depthShader("../source/shaders/depth.vert.glsl",
-		"../source/shaders/sdepth.frag.glsl", NULL);
-	Shader lightCullingShader("../source/shaders/light_culling.comp.glsl");
+	Shader depthShader("depth.vert.glsl",
+		"depth.frag.glsl", NULL);
+	Shader lightCullingShader("light_culling.comp.glsl");
 
 #if defined(DEPTH_DEBUG)
-	Shader depthDebugShader("../source/shaders/depth_debug.vert.glsl",
-		"../source/shaders/depth_debug.frag.glsl", NULL);
+	Shader depthDebugShader("depth_debug.vert.glsl",
+		"depth_debug.frag.glsl", NULL);
 #elif defined(LIGHT_DEBUG)
-	Shader lightDebugShader("../source/shaders/light_debug.vert.glsl",
-		"../source/shaders/light_debug.frag.glsl", NULL);
+	Shader lightDebugShader("light_debug.vert.glsl",
+		"light_debug.frag.glsl", NULL);
 #else
-	Shader lightAccumulationShader("../source/shaders/light_accumulation.vert.glsl",
-		"../source/shaders/light_accumulation.frag.glsl", NULL);
-	Shader hdrShader("./source/shaders/hdr.vert.glsl",
-		"../source/shaders/hdr.frag.glsl", NULL);
+	Shader lightAccumulationShader("light_accumulation.vert.glsl",
+		"light_accumulation.frag.glsl", NULL);
+	Shader hdrShader("hdr.vert.glsl",
+		"hdr.frag.glsl", NULL);
 #endif
 
 	// So we need to create a depth map FBO

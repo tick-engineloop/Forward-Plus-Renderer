@@ -4,8 +4,6 @@ project(ForwardPlusRenderer VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(BAMBOO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-
 find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
 find_package(glfw3 REQUIRED)
@@ -24,3 +22,13 @@ add_executable(${CMAKE_PROJECT_NAME} ${SOURCE_FILES})
 
 set(LIBS ${LIBS} GLEW GL glfw IL assimp)
 target_link_libraries(${CMAKE_PROJECT_NAME} ${LIBS})
+
+# copy shader files to build directory
+file(GLOB SHADERS
+    "${CMAKE_SOURCE_DIR}/source/shaders/*.glsl"
+)
+foreach(SHADER ${SHADERS})
+    if(UNIX)
+        file(COPY ${SHADER} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
+    endif(UNIX)
+endforeach(SHADER)
