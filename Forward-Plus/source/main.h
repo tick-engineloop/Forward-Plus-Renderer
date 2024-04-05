@@ -24,7 +24,7 @@ using namespace std;
 
 // Renderer constants
 const glm::ivec2 SCREEN_SIZE(1280, 720);
-const unsigned int NUM_LIGHTS = 128;
+const unsigned int NUM_LIGHTS = 1024;
 const float LIGHT_RADIUS = 30.0f;
 const float NEAR_PLANE = 0.1f;
 const float FAR_PLANE = 300.0f;
