@@ -280,7 +280,7 @@ int main(int argc, char **argv) {
 	InitScene();
 
 	// Scale and get the model view transformation matrix
-	glm::mat4 model;
+	glm::mat4 model(1.0f);
 	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
 
 	// For each shader, bind the uniforms that will during the program's execution
