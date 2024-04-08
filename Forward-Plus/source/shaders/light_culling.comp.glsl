@@ -31,6 +31,7 @@ shared uint minDepthInt;
 shared uint maxDepthInt;
 shared uint visibleLightCount;
 shared vec4 frustumPlanes[6];
+
 // Shared local storage for visible indices, will be written out to the global buffer at the end
 shared int visibleLightIndices[1024];
 shared mat4 viewProjection;
@@ -40,6 +41,7 @@ shared mat4 viewProjection;
 
 #define TILE_SIZE 16
 layout(local_size_x = TILE_SIZE, local_size_y = TILE_SIZE, local_size_z = 1) in;
+
 void main() {
 	ivec2 location = ivec2(gl_GlobalInvocationID.xy);
 	ivec2 itemID = ivec2(gl_LocalInvocationID.xy);
@@ -65,6 +67,16 @@ void main() {
 	depth = (0.5 * projection[3][2]) / (depth + 0.5 * projection[2][2] - 0.5);
 
 	// Convert depth to uint so we can do atomic min and max comparisons between the threads
+	// ====================================================================================================
+	// * genUType floatBitsToUint(genType x);
+	// | ---> floatBitsToUint 将浮点参数编码为 uint。浮点位级表示将被保留。
+	// ====================================================================================================
+	// * uint atomicMin(inout uint mem, uint data);
+	// | ---> atomicMin 将 data 与 mem 中的内容进行原子比较，然后将最小值写入 mem，并返回比较前 mem 中的原始内容。
+	// ====================================================================================================
+	// * uint atomicMax(inout uint mem, uint data);
+	// | ---> atomicMax 将 data 与 mem 中的内容进行原子比较，然后将最大值写入 mem，并返回比较前 mem 中的原始内容。
+	// ====================================================================================================
 	uint depthInt = floatBitsToUint(depth);
 	atomicMin(minDepthInt, depthInt);
 	atomicMax(maxDepthInt, depthInt);
@@ -82,12 +94,12 @@ void main() {
 		vec2 positiveStep = (2.0 * vec2(tileID + ivec2(1, 1))) / vec2(tileNumber);
 
 		// Set up starting values for planes using steps and min and max z values
-		frustumPlanes[0] = vec4(1.0, 0.0, 0.0, 1.0 - negativeStep.x); // Left
-		frustumPlanes[1] = vec4(-1.0, 0.0, 0.0, -1.0 + positiveStep.x); // Right
-		frustumPlanes[2] = vec4(0.0, 1.0, 0.0, 1.0 - negativeStep.y); // Bottom
-		frustumPlanes[3] = vec4(0.0, -1.0, 0.0, -1.0 + positiveStep.y); // Top
-		frustumPlanes[4] = vec4(0.0, 0.0, -1.0, -minDepth); // Near
-		frustumPlanes[5] = vec4(0.0, 0.0, 1.0, maxDepth); // Far
+		frustumPlanes[0] = vec4(1.0, 0.0, 0.0, 1.0 - negativeStep.x); 	// Left，定义左平面，平面方程为 x + (1.0 - negativeStep.x) = 0
+		frustumPlanes[1] = vec4(-1.0, 0.0, 0.0, -1.0 + positiveStep.x); // Right，定义右平面，平面方程为 x + (1.0 - positiveStep.x) = 0
+		frustumPlanes[2] = vec4(0.0, 1.0, 0.0, 1.0 - negativeStep.y); 	// Bottom，定义下平面，平面方程为 y + (1.0 - negativeStep.y) = 0
+		frustumPlanes[3] = vec4(0.0, -1.0, 0.0, -1.0 + positiveStep.y); // Top，定义上平面，平面方程为 y + (1.0 - positiveStep.y) = 0
+		frustumPlanes[4] = vec4(0.0, 0.0, -1.0, -minDepth); 			// Near，定义近平面， 平面方程为 z + minDepth = 0
+		frustumPlanes[5] = vec4(0.0, 0.0, 1.0, maxDepth); 				// Far，定义远平面，平面方程为 z + maxDepth = 0
 
 		// Transform the first four planes
 		for (uint i = 0; i < 4; i++) {
