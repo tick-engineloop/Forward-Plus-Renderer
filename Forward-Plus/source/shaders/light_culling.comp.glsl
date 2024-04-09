@@ -47,7 +47,7 @@ void main() {
 	ivec2 itemID = ivec2(gl_LocalInvocationID.xy);
 	ivec2 tileID = ivec2(gl_WorkGroupID.xy);
 	ivec2 tileNumber = ivec2(gl_NumWorkGroups.xy);
-	uint index = tileID.y * tileNumber.x + tileID.x;
+	uint index = tileID.y * tileNumber.x + tileID.x;	// 求当前计算着色器调用所在工作组的一维索引
 
 	// Initialize shared global values for depth and light count
 	if (gl_LocalInvocationIndex == 0) {
@@ -61,10 +61,10 @@ void main() {
 
 	// Step 1: Calculate the minimum and maximum depth values (from the depth buffer) for this group's tile
 	float maxDepth, minDepth;
-	vec2 text = vec2(location) / screenSize;
-	float depth = texture(depthMap, text).r;
+	vec2 text = vec2(location) / screenSize;	// 将 location 转换到 [0, 1] 范围内
+	float depth = texture(depthMap, text).r;	// 从名为 depthMap 的纹理中采样，并获取其红色分量。这通常用于从深度纹理中获取深度值。
 	// Linearize the depth value from depth buffer (must do this because we created it using projection)
-	depth = (0.5 * projection[3][2]) / (depth + 0.5 * projection[2][2] - 0.5);
+	depth = (0.5 * projection[3][2]) / (depth + 0.5 * projection[2][2] - 0.5);	// glm 矩阵是列主序，并且因为索引以 0 为起始， projection[3][2] 表示的是第 4 列第 3 行，projection[2][2] 表示的是第 3 列第 3 行
 
 	// Convert depth to uint so we can do atomic min and max comparisons between the threads
 	// ====================================================================================================
