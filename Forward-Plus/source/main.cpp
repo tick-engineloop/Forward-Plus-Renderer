@@ -403,9 +403,11 @@ int main(int argc, char **argv) {
 
 		// Blending might be needed if we add additional passes, but may not work correctly with objects with transparency masks
 		// Disabled for now
-		//glEnable(GL_BLEND);
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
+	#if 0
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
+	#endif
 
 		sponzaModel.Draw(lightAccumulationShader);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
